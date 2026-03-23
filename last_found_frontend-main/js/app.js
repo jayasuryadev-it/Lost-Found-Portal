@@ -2,7 +2,7 @@
    Lost & Found Portal — Shared JavaScript
    ═══════════════════════════════════════════════════════════ */
 
-const API_BASE = 'http://127.0.0.1:8000/api';
+const API_BASE = 'https://lost-found-portal-v4ev.onrender.com/api';
 
 // ──── Token Management ────
 function getToken() {
