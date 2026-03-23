@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Lost & Found Portal — Report, track, and recover lost items in your community. Fast, simple, and efficient.">
+    <title>Lost & Found Portal — Recover What Matters</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="icon" href="assets/logo.png" type="image/png">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar" id="main-navbar"></nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div style="position: relative; z-index: 1; max-width: 800px; padding: 0 24px;">
+            <img src="assets/logo.png" alt="Lost & Found Logo" class="hero-logo" style="margin-left:auto;margin-right:auto;">
+            <h1 class="hero-title">
+                Never Lose Hope.<br>
+                <span class="highlight">Find What Matters.</span>
+            </h1>
+            <p class="hero-subtitle">
+                A centralized platform to report, track, and recover lost items within your community. 
+                Connect with people who found your belongings — quickly and effortlessly.
+            </p>
+            <div class="hero-actions">
+                <a href="register.html" class="btn-primary" style="font-size:1.05rem; padding:16px 40px;">
+                    Get Started
+                </a>
+                <a href="login.html" class="btn-secondary" style="font-size:1.05rem; padding:16px 40px;">
+                    Sign In
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section">
+        <div style="text-align:center; margin-bottom:60px;">
+            <h2 style="font-size:2.2rem; font-weight:800; margin-bottom:12px;">How It Works</h2>
+            <p style="color:var(--text-secondary); font-size:1.05rem;">Three simple steps to recover your lost items</p>
+        </div>
+        <div class="features-grid">
+            <div class="glass-card feature-card">
+                <div class="feature-icon" style="font-size:2rem; font-weight:800; color:var(--accent);">01</div>
+                <h3 class="feature-title">Report an Item</h3>
+                <p class="feature-desc">Lost something? Post details including title, description, location, date, and a photo. Your listing goes live instantly.</p>
+            </div>
+            <div class="glass-card feature-card">
+                <div class="feature-icon" style="font-size:2rem; font-weight:800; color:var(--accent);">02</div>
+                <h3 class="feature-title">Browse & Search</h3>
+                <p class="feature-desc">Explore all lost and found listings. Filter by category, search by keywords, and find what you're looking for.</p>
+            </div>
+            <div class="glass-card feature-card">
+                <div class="feature-icon" style="font-size:2rem; font-weight:800; color:var(--accent);">03</div>
+                <h3 class="feature-title">Connect & Recover</h3>
+                <p class="feature-desc">Found someone's item? Click "I Found This" to notify the owner instantly via email with your contact details.</p>
+            </div>
+            <div class="glass-card feature-card">
+                <div class="feature-icon" style="font-size:2rem; font-weight:800; color:var(--accent);">04</div>
+                <h3 class="feature-title">Email Notifications</h3>
+                <p class="feature-desc">When someone finds your item, you'll receive an email notification with the finder's contact details automatically.</p>
+            </div>
+            <div class="glass-card feature-card">
+                <div class="feature-icon" style="font-size:2rem; font-weight:800; color:var(--accent);">05</div>
+                <h3 class="feature-title">Secure & Private</h3>
+                <p class="feature-desc">Your account is protected with secure authentication. Only share contact details when you choose to.</p>
+            </div>
+            <div class="glass-card feature-card">
+                <div class="feature-icon" style="font-size:2rem; font-weight:800; color:var(--accent);">06</div>
+                <h3 class="feature-title">Works Everywhere</h3>
+                <p class="feature-desc">Fully responsive design that works perfectly on desktops, tablets, and mobile devices.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section style="padding: 80px 24px; text-align: center;">
+        <div style="max-width: 900px; margin: 0 auto;">
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px;">
+                <div>
+                    <div style="font-size: 2.8rem; font-weight: 900; color: var(--accent);">100%</div>
+                    <div style="color: var(--text-secondary); margin-top: 8px;">Free to Use</div>
+                </div>
+                <div>
+                    <div style="font-size: 2.8rem; font-weight: 900; color: var(--accent);">--</div>
+                    <div style="color: var(--text-secondary); margin-top: 8px;">Instant Notifications</div>
+                </div>
+                <div>
+                    <div style="font-size: 2.8rem; font-weight: 900; color: var(--accent);">++</div>
+                    <div style="color: var(--text-secondary); margin-top: 8px;">Any Community</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section style="padding: 80px 24px; text-align: center;">
+        <div class="glass-card" style="max-width: 700px; margin: 0 auto; padding: 60px 40px;">
+            <h2 style="font-size: 2rem; font-weight: 800; margin-bottom: 16px;">Ready to Get Started?</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 32px; font-size: 1.05rem;">Join the community and help recover lost items today.</p>
+            <div class="hero-actions">
+                <a href="register.html" class="btn-primary" style="padding:16px 48px;">Create Account</a>
+                <a href="dashboard.html" class="btn-secondary" style="padding:16px 48px;">Browse Items</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>© 2024 Lost & Found Portal. All rights reserved.</p>
+    </footer>
+
+    <script src="js/app.js"></script>
+    <script>
+        // If logged in, redirect to dashboard
+        if (isLoggedIn()) {
+            // Don't redirect, just update navbar
+        }
+        renderNavbar('home');
+    </script>
+</body>
+</html>

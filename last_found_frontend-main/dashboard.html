@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Browse all lost and found items. Search and filter to find what you're looking for.">
+    <title>Dashboard — Lost & Found Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="icon" href="assets/logo.png" type="image/png">
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar" id="main-navbar"></nav>
+
+    <div class="page-container">
+        <!-- Header -->
+        <div
+            style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px; margin-bottom:32px;">
+            <div>
+                <h1 style="font-size:2rem; font-weight:800;">Browse Items</h1>
+                <p style="color:var(--text-secondary); margin-top:4px;">Find lost items or report something you found
+                </p>
+            </div>
+            <a href="report.html" class="btn-primary" id="report-btn">
+                + Report Item
+            </a>
+        </div>
+
+        <!-- Search & Filters -->
+        <div style="display:flex; gap:16px; flex-wrap:wrap; align-items:center; margin-bottom:24px;">
+            <div style="flex:1; min-width:250px;">
+                <input type="text" id="search-input" class="form-input"
+                    placeholder="Search by title, description, or location..." style="margin:0;">
+            </div>
+        </div>
+
+        <!-- Category Tabs -->
+        <div class="filter-tabs">
+            <button class="filter-tab active" data-category="all" onclick="filterByCategory('all', this)">All
+                Items</button>
+            <button class="filter-tab" data-category="LOST" onclick="filterByCategory('LOST', this)">Lost</button>
+            <button class="filter-tab" data-category="FOUND" onclick="filterByCategory('FOUND', this)">Found</button>
+        </div>
+
+        <!-- Loading -->
+        <div id="items-loading" class="spinner"></div>
+
+        <!-- Items Grid -->
+        <div id="items-grid" class="items-grid" style="display:none;"></div>
+
+        <!-- Empty State -->
+        <div id="empty-state" class="empty-state" style="display:none;">
+            <div class="empty-state-icon">--</div>
+            <p class="empty-state-text">No items found</p>
+            <p style="color:var(--text-muted); font-size:0.9rem;">Try adjusting your search or filters</p>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>© 2024 Lost & Found Portal. All rights reserved.</p>
+    </footer>
+
+    <script src="js/app.js"></script>
+    <script>
+        renderNavbar('dashboard');
+
+        let allItems = [];
+        let currentCategory = 'all';
+
+        // ── Load items ──
+        async function loadItems() {
+            const loading = document.getElementById('items-loading');
+            const grid = document.getElementById('items-grid');
+            const empty = document.getElementById('empty-state');
+
+            loading.style.display = 'block';
+            grid.style.display = 'none';
+            empty.style.display = 'none';
+
+            try {
+                const resp = await apiFetch('/items');
+                if (resp && resp.ok) {
+                    allItems = await resp.json();
+                    renderItems();
+                } else {
+                    showToast('Failed to load items', 'error');
+                }
+            } catch (err) {
+                showToast('Network error', 'error');
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+
+        // ── Render items ──
+        function renderItems() {
+            const grid = document.getElementById('items-grid');
+            const empty = document.getElementById('empty-state');
+            const search = document.getElementById('search-input').value.toLowerCase();
+
+            let filtered = allItems;
+
+            // Category filter
+            if (currentCategory !== 'all') {
+                filtered = filtered.filter(item => item.category === currentCategory);
+            }
+
+            // Search filter
+            if (search) {
+                filtered = filtered.filter(item =>
+                    (item.title && item.title.toLowerCase().includes(search)) ||
+                    (item.description && item.description.toLowerCase().includes(search)) ||
+                    (item.location && item.location.toLowerCase().includes(search))
+                );
+            }
+
+            if (filtered.length === 0) {
+                grid.style.display = 'none';
+                empty.style.display = 'block';
+                return;
+            }
+
+            empty.style.display = 'none';
+            grid.style.display = 'grid';
+
+            grid.innerHTML = filtered.map(item => {
+                const imageHTML = item.image_url
+                    ? `<div class="item-card-image"><img src="${item.image_url}" alt="${item.title}" loading="lazy"></div>`
+                    : `<div class="item-card-placeholder">No Image</div>`;
+
+                return `
+                    <div class="item-card" onclick="window.location.href='item.html?id=${item.id}'">
+                        ${imageHTML}
+                        <div class="item-card-body">
+                            <div style="display:flex; gap:8px; margin-bottom:10px;">
+                                ${categoryBadge(item.category)}
+                                ${statusBadge(item.status)}
+                            </div>
+                            <h3 class="item-card-title">${item.title}</h3>
+                            <p class="item-card-desc">${item.description || 'No description provided'}</p>
+                            <div class="item-card-meta">
+                                <span>${item.location || 'Unknown'}</span>
+                                <span>${formatDate(item.created_at)}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // ── Filter by category ──
+        function filterByCategory(category, btn) {
+            currentCategory = category;
+            document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+            btn.classList.add('active');
+            renderItems();
+        }
+
+        // ── Search debounce ──
+        let searchTimeout;
+        document.getElementById('search-input').addEventListener('input', () => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(renderItems, 300);
+        });
+
+        // ── Init ──
+        loadItems();
+    </script>
+</body>
+
+</html>

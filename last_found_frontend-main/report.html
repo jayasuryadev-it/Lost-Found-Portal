@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Report a lost or found item on the Lost & Found Portal.">
+    <title>Report Item — Lost & Found Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="icon" href="assets/logo.png" type="image/png">
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar" id="main-navbar"></nav>
+
+    <div class="page-container" style="max-width:700px;">
+        <div style="margin-bottom:32px;">
+            <h1 style="font-size:2rem; font-weight:800;">Report an Item</h1>
+            <p style="color:var(--text-secondary); margin-top:4px;">Fill in the details below to report a lost or found
+                item</p>
+        </div>
+
+        <div class="glass-card" style="padding:40px;">
+            <form id="report-form">
+                <!-- Category Selection -->
+                <div class="form-group">
+                    <label class="form-label">Category *</label>
+                    <div style="display:flex; gap:12px;">
+                        <label style="flex:1; cursor:pointer;">
+                            <input type="radio" name="category" value="LOST" required style="display:none;"
+                                id="cat-lost">
+                            <div class="category-option" id="cat-lost-label" onclick="selectCategory('LOST')"
+                                style="padding:16px; border-radius:12px; border:2px solid var(--border-color); text-align:center; transition:all 0.3s ease;">
+                                <div style="font-size:1.2rem; margin-bottom:4px; color:#EF4444; font-weight:700;">LOST</div>
+                                <div style="font-weight:600;">I Lost Something</div>
+                            </div>
+                        </label>
+                        <label style="flex:1; cursor:pointer;">
+                            <input type="radio" name="category" value="FOUND" style="display:none;" id="cat-found">
+                            <div class="category-option" id="cat-found-label" onclick="selectCategory('FOUND')"
+                                style="padding:16px; border-radius:12px; border:2px solid var(--border-color); text-align:center; transition:all 0.3s ease;">
+                                <div style="font-size:1.2rem; margin-bottom:4px; color:#4CAF50; font-weight:700;">FOUND</div>
+                                <div style="font-weight:600;">I Found Something</div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Title -->
+                <div class="form-group">
+                    <label class="form-label">Item Title *</label>
+                    <input type="text" id="item-title" class="form-input" placeholder="e.g., Blue iPhone 15 Pro"
+                        required>
+                </div>
+
+                <!-- Description -->
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <textarea id="item-desc" class="form-input"
+                        placeholder="Provide detailed description — color, brand, distinguishing features..."
+                        rows="4"></textarea>
+                </div>
+
+                <!-- Location -->
+                <div class="form-group">
+                    <label class="form-label">Location</label>
+                    <input type="text" id="item-location" class="form-input"
+                        placeholder="e.g., Library 2nd Floor, Cafeteria">
+                </div>
+
+                <!-- Date -->
+                <div class="form-group">
+                    <label class="form-label">Date (Lost/Found)</label>
+                    <input type="date" id="item-date" class="form-input">
+                </div>
+
+                <!-- Image Upload -->
+                <div class="form-group">
+                    <label class="form-label">Item Image</label>
+                    <div class="image-upload-area" id="upload-area">
+                        <input type="file" id="item-image" accept="image/*" onchange="handleImageUpload(event)">
+                        <div id="upload-placeholder">
+                            <div style="font-size:1.2rem; margin-bottom:8px; color:var(--text-secondary); font-weight:600;">Upload</div>
+                            <p style="color:var(--text-secondary); font-size:0.9rem;">Click or drag to upload an image
+                            </p>
+                            <p style="color:var(--text-muted); font-size:0.8rem; margin-top:4px;">JPG, PNG, WEBP (max
+                                5MB)</p>
+                        </div>
+                        <img id="image-preview" class="image-upload-preview" style="display:none;">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-primary" style="width:100%; margin-top:12px; padding:16px;"
+                    id="submit-btn">
+                    Submit Report
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        if (!requireAuth()) { /* redirected */ }
+        renderNavbar('report');
+
+        let selectedCategory = null;
+        let imageBase64 = null;
+
+        function selectCategory(cat) {
+            selectedCategory = cat;
+            document.getElementById('cat-' + cat.toLowerCase()).checked = true;
+
+            // Visual feedback
+            const lostLabel = document.getElementById('cat-lost-label');
+            const foundLabel = document.getElementById('cat-found-label');
+
+            lostLabel.style.borderColor = cat === 'LOST' ? '#EF4444' : 'var(--border-color)';
+            lostLabel.style.background = cat === 'LOST' ? 'rgba(239,68,68,0.1)' : 'transparent';
+            foundLabel.style.borderColor = cat === 'FOUND' ? '#4CAF50' : 'var(--border-color)';
+            foundLabel.style.background = cat === 'FOUND' ? 'rgba(76,175,80,0.1)' : 'transparent';
+        }
+
+        async function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            if (file.size > 5 * 1024 * 1024) {
+                showToast('Image must be under 5MB', 'error');
+                return;
+            }
+
+            try {
+                imageBase64 = await fileToBase64(file);
+                const preview = document.getElementById('image-preview');
+                preview.src = imageBase64;
+                preview.style.display = 'block';
+                document.getElementById('upload-placeholder').style.display = 'none';
+            } catch (err) {
+                showToast('Failed to load image', 'error');
+            }
+        }
+
+        document.getElementById('report-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            if (!selectedCategory) {
+                showToast('Please select a category (Lost or Found)', 'error');
+                return;
+            }
+
+            const btn = document.getElementById('submit-btn');
+            btn.textContent = 'Submitting...';
+            btn.disabled = true;
+
+            const payload = {
+                title: document.getElementById('item-title').value.trim(),
+                description: document.getElementById('item-desc').value.trim() || null,
+                category: selectedCategory,
+                location: document.getElementById('item-location').value.trim() || null,
+                date_reported: document.getElementById('item-date').value || null,
+                image_url: imageBase64 || null,
+            };
+
+            try {
+                const resp = await apiFetch('/items', {
+                    method: 'POST',
+                    body: payload,
+                });
+
+                if (resp && resp.ok) {
+                    showToast('Item reported successfully!', 'success');
+                    setTimeout(() => window.location.href = 'dashboard.html', 1500);
+                } else {
+                    const data = await resp.json();
+                    showToast(data.detail || 'Failed to submit report', 'error');
+                }
+            } catch (err) {
+                showToast('Network error. Please try again.', 'error');
+            } finally {
+                btn.textContent = 'Submit Report';
+                btn.disabled = false;
+            }
+        });
+    </script>
+</body>
+
+</html>
